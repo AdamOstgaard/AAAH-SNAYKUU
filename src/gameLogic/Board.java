@@ -7,7 +7,7 @@ import java.util.HashSet;
 /**
  * This class represents the entire game board through a 2D-array of Square objects.
  * Each Square, in turn, contains GameObjects, such as fruits, walls, or other snakes.
- * 
+ *
  * @author 	Sixten Hilborn
  * @author	Arian Jafari
  * @see		Square
@@ -16,7 +16,7 @@ import java.util.HashSet;
 public class Board implements Serializable
 {
 	private Square[][] board;
-	
+
 	Board(int width, int height)
 	{
 		if (width < 1 || height < 1)
@@ -26,7 +26,7 @@ public class Board implements Serializable
 			for (int y = 0; y < height; ++y)
 				board[x][y] = new Square();
 	}
-	
+
 	/**
 	 * Copy constructor.
 	 */
@@ -37,31 +37,31 @@ public class Board implements Serializable
 			for (int y = 0; y < getHeight(); ++y)
 				board[x][y] = new Square(other.board[x][y]);
 	}
-	
+
 	/**
 	 * Gets the width of the board (the 2D-array).
-	 * 
+	 *
 	 * @return	The width of the board.
 	 */
 	public int getWidth()
 	{
 		return board.length;
 	}
-	
+
 	/**
 	 * Gets the height of the board (the 2D-array).
-	 * 
+	 *
 	 * @return	The height of the board.
 	 */
 	public int getHeight()
 	{
 		return board[0].length;
 	}
-	
+
 	/**
 	 * Returns whether or not the board contains any game object at the given position.
 	 * Doesn't perform any checks on what type of object it is, like if it is lethal or not.
-	 * 
+	 *
 	 * @param	p	The position we want to check for game objects.
 	 * @return	Whether or not the board contains a game object at the given position.
 	 */
@@ -69,10 +69,10 @@ public class Board implements Serializable
 	{
 		return (!getSquare(p).isEmpty());
 	}
-	
+
 	/**
 	 * Returns whether or not the board contains a fruit at the given position.
-	 * 
+	 *
 	 * @param	p	The position we want to check for fruit.
 	 * @return	Whether or not the board contains a fruit at the given position.
 	 */
@@ -80,10 +80,10 @@ public class Board implements Serializable
 	{
 		return (getSquare(p).hasFruit());
 	}
-	
+
 	/**
 	 * Returns whether or not the board contains a wall at the given position.
-	 * 
+	 *
 	 * @param	p	The position we want to check for walls.
 	 * @return	Whether or not the board contains a wall at the given position.
 	 */
@@ -91,10 +91,10 @@ public class Board implements Serializable
 	{
 		return (getSquare(p).hasWall());
 	}
-	
+
 	/**
 	 * Returns whether or not the board contains a snake at the given position.
-	 * 
+	 *
 	 * @param	p	The position we want to check for snakes.
 	 * @return	Whether or not the board contains a snake at the given position.
 	 * @see		Square
@@ -103,10 +103,10 @@ public class Board implements Serializable
 	{
 		return (getSquare(p).hasSnake());
 	}
-	
+
 	/**
 	 * Returns whether or not the board contains a lethal game object at the given position.
-	 * 
+	 *
 	 * @param	p	The position we want to check for lethal objects.
 	 * @return	Whether or not the board contains a lethal game object at the given position.
 	 * @see		Square
@@ -115,10 +115,10 @@ public class Board implements Serializable
 	{
 		return (getSquare(p).isLethal());
 	}
-	
+
 	/**
-	 * Gets a Square at 
-	 * 
+	 * Gets a Square at
+	 *
 	 * @param	p	The position in the board where we want to get the Square from.
 	 * @return	The Square at the specified position.
 	 * @see 		Square
@@ -127,11 +127,11 @@ public class Board implements Serializable
 	{
 		return board[p.getX()][p.getY()];
 	}
-	
+
 	/**
 	 * Calculates whether or not the board contains a lethal object within a given radius of
 	 * a certain square. Works by using a depth-first search.
-	 * 
+	 *
 	 * @param	pos		The position which we want to check.
 	 * @param	range	The number of squares we wish to examine, e.g.
 	 *					the radius of the area we want to check.
@@ -144,21 +144,21 @@ public class Board implements Serializable
 		depthFirstSearch(pos, visited, range);
 		return (containsLethalObject(visited));
 	}
-	
+
 	private void depthFirstSearch(Position from, Set<Position> visited, int range)
 	{
 		if (range-- < 0)
 			return;
-			
+
 		visited.add(from);
-		
+
 		for (Position neighbour : from.getNeighbours())
 		{
 			if (!visited.contains(neighbour))
 				depthFirstSearch(neighbour, visited, range);
 		}
 	}
-	
+
 	private boolean containsLethalObject(Set<Position> positions)
 	{
 		for (Position pos : positions)
@@ -170,29 +170,71 @@ public class Board implements Serializable
 		}
 		return false;
 	}
-	
+
 	void addGameObject(GameObjectType obj, Position p)
 	{
 		board[p.getX()][p.getY()].addGameObject(new GameObject(obj));
 	}
-	
+
 	void addGameObject(GameObject obj, Position p)
 	{
 		board[p.getX()][p.getY()].addGameObject(obj);
 	}
-	
+
 	void clearSquare(Position p)
 	{
 		board[p.getX()][p.getY()].clear();
 	}
-	
+
 	void removeGameObject(GameObject obj, Position p)
 	{
 		board[p.getX()][p.getY()].removeGameObject(obj);
 	}
-	
+
 	void removeFruit(Position p)
 	{
 		board[p.getX()][p.getY()].removeFruit();
+	}
+
+	// 0 = empty
+	// x = wall
+	// n = snake north
+	// w = snake west
+	// e = snake east
+	// s = snake south
+	// f = fruit
+	public String getHash(){
+		StringBuilder code = new StringBuilder();
+		for (Square[] squares : board) {
+			for (Square square : squares) {
+				if(square.isEmpty()){
+					code.append("0");
+					continue;
+				}
+				if(square.hasFruit()){
+					code.append("f");
+					continue;
+				}
+				if(square.hasWall()){
+					code.append("x");
+					continue;
+				}
+				if(square.hasSnake()){
+					Direction dir = square.getSnakes().get(0).getCurrentDirection();
+					switch(dir){
+						case WEST:
+							code.append("w");
+						case NORTH:
+							code.append("n");
+						case SOUTH:
+							code.append("s");
+						case EAST:
+							code.append("e");
+					}
+					continue;
+				}
+			}
+		}
+		return code.toString();
 	}
 }
