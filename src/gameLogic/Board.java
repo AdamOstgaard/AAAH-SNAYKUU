@@ -159,6 +159,17 @@ public class Board implements Serializable
 		}
 	}
 
+	//Används om spawnande frukt ska bete sig som old school Snake /bubblan
+	boolean hasAnyFruit(){
+		for (int col = 0; col < getWidth(); col++){
+			for (int row = 0; row < getHeight(); row++){
+				if (board[col][row].hasFruit())
+					return true;
+			}
+		}
+		return false;
+	}
+
 	private boolean containsLethalObject(Set<Position> positions)
 	{
 		for (Position pos : positions)
