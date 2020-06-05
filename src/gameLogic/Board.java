@@ -16,11 +16,14 @@ import java.util.HashSet;
 public class Board implements Serializable
 {
 	private Square[][] board;
+	private int cols, rows;
 
 	Board(int width, int height)
 	{
 		if (width < 1 || height < 1)
 			throw new IllegalArgumentException("Board size must be greater than 0");
+		cols = width;
+		rows = height;
 		board = new Square[width][height];
 		for (int x = 0; x < width; ++x)
 			for (int y = 0; y < height; ++y)
@@ -216,38 +219,83 @@ public class Board implements Serializable
 	// e = snake east
 	// s = snake south
 	// f = fruit
-	public String getHash(){
+	public String getHash(Direction dir){
 		StringBuilder code = new StringBuilder();
-		for (Square[] squares : board) {
-			for (Square square : squares) {
-				if(square.isEmpty()){
-					code.append("0");
+		Square[][] hashBoard = new Square[0][0];
+		switch(dir){
+			case WEST:
+				hashBoard = Rotate90DegreesLeft();
+				break;
+			case NORTH:
+				hashBoard = board;
+				break;
+			case SOUTH:
+				hashBoard = Rotate180Degrees();
+				break;
+			case EAST:
+				hashBoard = Rotate90DegreesRight();
+				break;
+		}
+		long hashCode = 0;
+		for (int col = 0; col < hashBoard.length; col++) {
+			for (int row = 0; row < hashBoard[col].length; row++) {
+				if(hashBoard[col][row].hasFruit()){
+					hashCode = hashCode + col * 509;
+					hashCode = hashCode + row * 857;
 					continue;
 				}
-				if(square.hasFruit()){
-					code.append("f");
-					continue;
-				}
-				if(square.hasWall()){
-					code.append("x");
-					continue;
-				}
-				if(square.hasSnake()){
-					Direction dir = square.getSnakes().get(0).getCurrentDirection();
-					switch(dir){
-						case WEST:
-							code.append("w");
-						case NORTH:
-							code.append("n");
-						case SOUTH:
-							code.append("s");
-						case EAST:
-							code.append("e");
-					}
+				if(hashBoard[col][row].hasSnake()){
+					hashCode = hashCode + col * 911;
+					hashCode = hashCode + row * 311; 
 					continue;
 				}
 			}
 		}
+		code.append(hashCode);
 		return code.toString();
+	}
+
+	//Roterar 90 grader medsols /bubblan
+	Square[][] Rotate90DegreesRight(){
+		Square[][] rotatedBoard = new Square[rows][cols];
+		for (int row = 0; row < rows; row++){
+            for (int col = 0; col < cols; col++){
+                rotatedBoard[rows - 1 - row][col] = board[col][row];
+            }
+		}
+		return rotatedBoard;
+	}
+
+	//Roterar 180 grader /bubblan
+	Square[][] Rotate180Degrees(){
+		Square[][] rotatedBoard = new Square[cols][rows];
+        for (int col = 0; col < cols; col++){
+            for (int row = 0; row < rows; row++){
+                rotatedBoard[cols - 1 - col][rows - 1 - row] = board[col][row];
+            }
+        }
+		return rotatedBoard;
+	}
+
+	//Roterar 90 grader motsols /bubblan
+	Square[][] Rotate90DegreesLeft(){
+		Square[][] rotatedBoard = new Square[rows][cols];
+        for (int row = 0; row < rows; row++){
+            for (int col = 0; col < cols; col++){
+                rotatedBoard[row][cols - 1 - col] = board[col][row];
+            }
+        }
+		return rotatedBoard;
+	}
+
+	//Används om spawnande frukt ska bete sig som old school Snake /bubblan
+	boolean hasAnyFruit(){
+		for (int col = 0; col < cols; col++){
+			for (int row = 0; row < rows; row++){
+				if (board[col][row].hasFruit())
+					return true;
+			}
+		}
+		return false;
 	}
 }

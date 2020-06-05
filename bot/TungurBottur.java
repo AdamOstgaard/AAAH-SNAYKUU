@@ -16,7 +16,7 @@ public class TungurBottur implements Brain {
 
 	@Override
 	public Direction getNextMove(Snake yourSnake, GameState gameState) {
-		String stateHash = gameState.getBoard().getHash();
+		String stateHash = gameState.getBoard().getHash(yourSnake.getCurrentDirection());
 		HashMap<Direction, Integer> actions = memory.get(stateHash);
 
 		//pick random dir and record result if statte is unknown
@@ -49,7 +49,7 @@ public class TungurBottur implements Brain {
 			lookAhead(iterations--, Direction.WEST, nextPosition, nextBoard);
 		}
 
-		HashMap<Direction, Integer> knownDirs = memory.get(nextBoard.getHash());
+		HashMap<Direction, Integer> knownDirs = memory.get(nextBoard.getHash(yourSnake.getCurrentDirection()));
 		int northScore = knownDirs.getOrDefault(Direction.NORTH, Integer.MIN_VALUE);
 		int westScore = knownDirs.getOrDefault(Direction.WEST, Integer.MIN_VALUE);
 		int eastScore = knownDirs.getOrDefault(Direction.EAST, Integer.MIN_VALUE);
