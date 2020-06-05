@@ -1,5 +1,6 @@
 package bot;
 
+import com.sun.xml.internal.rngom.digested.DInterleavePattern;
 import gameLogic.*;
 
 import java.util.Arrays;
@@ -36,14 +37,36 @@ public class TungurBottur implements Brain {
 			}
 		}
 
-		return getBestDir(actions);
+		return getBestDir(actions).direction;
 	}
 
-	private Direction getBestDir(HashMap<Direction, Integer> knownDirs){
+	private ScoredDirection lookAhead(int iterations, Direction currentDirection, Position currentPosition , Board currentBoard){
+		Snake tempSnake = currentBoard.getSquare(currentPosition).getSnakes().get(0);
+		Board nextBoard = currentBoard.getBoardWithNextPosition(currentDirection, tempSnake);
+		Position nextPosition = currentDirection.calculateNextPosition(currentPosition);
+
+		if(isValidDirection(Direction.WEST, currentDirection)){
+			lookAhead(iterations--, Direction.WEST, nextPosition, nextBoard);
+		}
+
+		HashMap<Direction, Integer> knownDirs = memory.get(nextBoard.getHash());
 		int northScore = knownDirs.getOrDefault(Direction.NORTH, Integer.MIN_VALUE);
-		int westScore = knownDirs.getOrDefault(Direction.NORTH, Integer.MIN_VALUE);
-		int eastScore = knownDirs.getOrDefault(Direction.NORTH, Integer.MIN_VALUE);
-		int southScore = knownDirs.getOrDefault(Direction.NORTH, Integer.MIN_VALUE);
+		int westScore = knownDirs.getOrDefault(Direction.WEST, Integer.MIN_VALUE);
+		int eastScore = knownDirs.getOrDefault(Direction.EAST, Integer.MIN_VALUE);
+		int southScore = knownDirs.getOrDefault(Direction.SOUTH, Integer.MIN_VALUE);
+		Integer[] values = {
+				northScore,
+				westScore,
+				eastScore,
+				southScore
+		};
+	}
+
+	private ScoredDirection getBestDir(HashMap<Direction, Integer> knownDirs){
+		int northScore = knownDirs.getOrDefault(Direction.NORTH, Integer.MIN_VALUE);
+		int westScore = knownDirs.getOrDefault(Direction.WEST, Integer.MIN_VALUE);
+		int eastScore = knownDirs.getOrDefault(Direction.EAST, Integer.MIN_VALUE);
+		int southScore = knownDirs.getOrDefault(Direction.SOUTH, Integer.MIN_VALUE);
 		Integer[] values = {
 				northScore,
 				westScore,
@@ -53,18 +76,18 @@ public class TungurBottur implements Brain {
 		int max = Collections.max(Arrays.asList(values));
 
 		if(max == westScore){
-			return Direction.WEST;
+			return new ScoredDirection(Direction.WEST, max);
 		}
 
 		if(max == eastScore){
-			return Direction.EAST;
+			return new ScoredDirection(Direction.EAST, max);
 		}
 
 		if(max == southScore){
-			return Direction.SOUTH;
+			return new ScoredDirection(Direction.SOUTH, max);
 		}
 
-		return Direction.NORTH;
+		return new ScoredDirection(Direction.NORTH, max);
 	}
 
 	private Direction getRandomUnexplordedDirection(HashMap<Direction, Integer> explored){
@@ -114,6 +137,16 @@ public class TungurBottur implements Brain {
 
 			default:
 				throw new IllegalArgumentException("No such Direction exists.");
+		}
+	}
+
+	class ScoredDirection {
+		Direction direction;
+		int score;
+
+		ScoredDirection(Direction dir, int s){
+			direction = dir;
+			score = s;
 		}
 	}
 }

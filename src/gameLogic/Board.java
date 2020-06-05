@@ -196,6 +196,19 @@ public class Board implements Serializable
 		board[p.getX()][p.getY()].removeFruit();
 	}
 
+	public Board getBoardWithNextPosition(Direction direction, Snake snake){
+		Board b = new Board(this);
+		Snake s = new Snake(snake);
+		Position newHeadPosition = s.moveHead(direction);
+		if(b.hasFruit(newHeadPosition)){
+			b.clearSquare(newHeadPosition);
+		}
+		b.addGameObject(s, newHeadPosition);
+
+		b.removeGameObject(snake, s.removeTail());
+		return b;
+	}
+
 	// 0 = empty
 	// x = wall
 	// n = snake north

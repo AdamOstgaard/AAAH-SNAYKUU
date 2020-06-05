@@ -75,15 +75,6 @@ public class GameState
 		return errorState;
 	}
 
-	public Board getBoardWithNextPosition(Direction direction, Snake snake){
-		Board b = new Board(board);
-		Snake s = new Snake(snake);
-		Position newHeadPosition = s.moveHead(direction);
-		board.addGameObject(s, newHeadPosition);
-
-		b.removeGameObject(snake, s.removeTail());
-		return b;
-	}
 
 	/**
 	 * This method can be used to help calculate whether or not a given snake will collide next
