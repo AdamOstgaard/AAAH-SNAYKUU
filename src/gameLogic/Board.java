@@ -200,7 +200,7 @@ public class Board implements Serializable
 		Board b = new Board(this);
 		Snake s = new Snake(snake);
 		Position newHeadPosition = s.moveHead(direction);
-		if(b.hasFruit(newHeadPosition)){
+		if(newHeadPosition.getX() >= 0 && newHeadPosition.getY() >= 0 &&  b.hasFruit(newHeadPosition)){
 			b.clearSquare(newHeadPosition);
 		}
 		b.addGameObject(s, newHeadPosition);
@@ -237,12 +237,16 @@ public class Board implements Serializable
 					switch(dir){
 						case WEST:
 							code.append("w");
+							break;
 						case NORTH:
 							code.append("n");
+							break;
 						case SOUTH:
 							code.append("s");
+							break;
 						case EAST:
 							code.append("e");
+							break;
 					}
 					continue;
 				}

@@ -26,7 +26,7 @@ public class Snake extends GameObject implements Serializable
 	private int lifespan = 0;
 	private boolean isDead = false;
 	private Color color;
-	
+
 	public Snake(GameObjectType type, String name, Brain brain, Color color)
 	{
 		super(type);
@@ -34,7 +34,7 @@ public class Snake extends GameObject implements Serializable
 		this.brain = brain;
 		this.color = color;
 	}
-	
+
 	public Snake(Snake other)
 	{
 		super(other.getType());
@@ -47,38 +47,38 @@ public class Snake extends GameObject implements Serializable
 		this.isDead = other.isDead;
 		this.color = other.color;
 	}
-	
+
 	/**
 	 * Get a list of all the squares this snake has occupied.
-	 * 
+	 *
 	 * @return A list of the positions of the occupied squares.
 	 */
 	public LinkedList<Position> getSegments()
 	{
 		return new LinkedList<Position>(segments);
 	}
-	
+
 	/**
-	 * Get a list of SnakeSegments, which represent each square this snake is 
+	 * Get a list of SnakeSegments, which represent each square this snake is
 	 * occupying together with its direction at each point.
-	 * 
-	 * This method is mainly useful for drawing purposes, getSegments() is 
+	 *
+	 * This method is mainly useful for drawing purposes, getSegments() is
 	 * recommended for most other uses.
-	 * 
+	 *
 	 * @return A list of this snake's positions and directions.
 	 */
 	public LinkedList<SnakeSegment> getDrawData()
 	{
 		return new LinkedList<SnakeSegment>(directionLog);
 	}
-	
+
 	/**
 	 * Get the direction of a specific segment in this snake.
-	 * 
+	 *
 	 * @param position The position (in x-y coordinates) of the segment.
 	 * @return The direction of that segment, or null if this snake has no segment on the specified position.
 	 */
-	
+
 	@Deprecated //also no longer used anywhere
 	public Direction getDirection(Position position)
 	{
@@ -89,10 +89,10 @@ public class Snake extends GameObject implements Serializable
 				return ss.getDir();
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Gets the current position of this snake's head.
 	 *
@@ -103,7 +103,7 @@ public class Snake extends GameObject implements Serializable
 	{
 		return segments.getFirst();
 	}
-	
+
 	/**
 	 * Gets the current position of the last segment of the snake's tail.
 	 *
@@ -113,9 +113,9 @@ public class Snake extends GameObject implements Serializable
 	{
 		return segments.getLast();
 	}
-	
+
 	/**
-	 * Returns whether or not this snake is dead. Note that a dead snake won't be 
+	 * Returns whether or not this snake is dead. Note that a dead snake won't be
 	 * removed from the board; it will only be unable to move and unable to win the
 	 * game.
 	 *
@@ -125,7 +125,7 @@ public class Snake extends GameObject implements Serializable
 	{
 		return isDead;
 	}
-	
+
 	/**
 	 * Gets the direction this snake moved in last turn. Note that it does not actually
 	 * get the direction the snake will move in next turn.
@@ -136,9 +136,9 @@ public class Snake extends GameObject implements Serializable
 	{
 		return directionLog.getFirst().getDir();
 	}
-	
+
 	/**
-	 * Gets the number of fruits this snake has eaten. 
+	 * Gets the number of fruits this snake has eaten.
 	 *
 	 * @return	The number of fruits eaten by this snake.
 	 */
@@ -146,83 +146,83 @@ public class Snake extends GameObject implements Serializable
 	{
 		return score;
 	}
-	
+
 	/**
 	 * Gets the number of turns this snake has lived. If the snake is currently dead,
 	 * this method returns the number of turns it was alive before its death.
-	 * 
+	 *
 	 * @return 	Age of the snake, in turns.
 	 */
 	public int getLifespan()
 	{
 		return lifespan;
 	}
-	
+
 	/**
 	 * Returns a string representation of this snake, consisting of a String of its name.
-	 * 
+	 *
 	 * @return	The snake's name as a string.
 	 */
 	public String toString()
 	{
 		return name;
 	}
-	
+
 	void placeOnBoard(LinkedList<Position> segments, Direction originalDirection)
 	{
 		this.segments = segments;
-		
+
 		for(Position p : segments)
 		{
 			directionLog.add(new SnakeSegment(p, originalDirection));
 		}
 	}
-	
-	Position moveHead(Direction dir)
+
+	public Position moveHead(Direction dir)
 	{
 		Position pos = dir.calculateNextPosition(getHeadPosition());
 		segments.addFirst(pos);
 		directionLog.addFirst(new SnakeSegment(pos, dir));
-		
+
 		return pos;
 	}
-	
+
 	Position removeTail()
 	{
 		directionLog.removeLast();
 		return segments.removeLast();
 	}
-	
+
 	void kill()
 	{
 		isDead = true;
 	}
-	
+
 	Brain getBrain()
 	{
 		return brain;
 	}
-		
+
 	void addScore(int points)
 	{
 		score += points;
 	}
-	
+
 	void increaseLifespan()
 	{
 		++lifespan;
 	}
-	
+
 	void removeBrain()
 	{
 		brain = null;
 	}
-	
+
 	public Color getColor()
 	{
 		return color;
 	}
-	
+
 	public String getName()
 	{
 		return name;
